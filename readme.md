@@ -79,11 +79,15 @@ Get all in 1 line
 #### Nodeport, Ingress, Loadbalancer - To get external traffic to the cluster
 <p> #### <b>ClusterIP</b> is default kubernetes service. Automatically created. There is no external access.</p>
 
+### Nodeport
+```
 <p><b>NodePort</b>, as the name implies, opens a specific port on all the Nodes (the VMs), and any traffic that is sent to this port is forwarded to the service.</p>
-![NodePort](./nodeport.png)
 <img src="./nodeport.png" alt="NodePort"/>
+```
 
+#### Load Balancer
+```
 <p><b>LoadBalancer</b> A LoadBalancer service is the standard way to expose a service to the internet. On Azure this will spin up a Network Load Balancer that will give you a single IP address that will forward all traffic to your service.</p>
-![NodePort](./loadbalancer.png)
+```
 <img src="./loadbalancer.png" alt="Load Balancer"/>
 
