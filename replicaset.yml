@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: replicaset1
+spec:
+  replicas: 3
+  selector:  #The selector is used to create pods using matchlabels defined in the template field.
+    matchLabels:  #Filter/match pods
+      app: nginx-app  # Define which pods this replicate set OBJECT should apply to
+  template:  #The template is a POD TEMPLATE that is used by a selector to create a set of pods.
+    metadata:
+      name: nginx-pod  #pod name
+      labels:      #label for pod
+        app: nginx-app
+    spec:
+      containers:
+        - name: nginxcontainer
+          image: nginx
+          ports:
+            - containerPort: 80

@@ -1,0 +1,21 @@
+# POD example with environment variables and multiple labels
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod2
+  labels:
+    app: nginx
+    tier: dev
+spec:
+  containers:
+  - name: nginxcontainer
+    image: nginx
+    env:
+      - name: greeting
+        value: "hello from environment variable"
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 8080

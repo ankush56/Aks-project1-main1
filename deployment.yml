@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector: #match label and assign this deployment OBJECT to pods with label app:nginx
+    matchLabels:  
+      app:  nginx
+  replicas: 3
+  template:   #Template used to create pods
+    metadata:
+      name: nginx-pod #pod name
+      labels:   #label for pod app=nginx
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        env:
+          - name: customenv
+            value: "Hello from customenv"
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 80

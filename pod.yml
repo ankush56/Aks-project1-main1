@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:     #metadata for pod
+  name: pod1  #This will give name to pod..when u do kubectl get pods---Under name it will be pod1
+  labels:
+    name: pod_label
+spec:
+  containers:
+  - name: nginx-container
+    image: nginx
+    env:
+      - name: myenvironmentvar
+        value: "Hello from my env variable"
+    resources:
+      limits:
+        memory: "128Mi"
+        cpu: "500m"
+    ports:
+      - containerPort: 80
