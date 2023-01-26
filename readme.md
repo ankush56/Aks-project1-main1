@@ -1,93 +1,87 @@
-#### PODS ####
-###
+#####
 ```
-pod.yml
-pod2.yml
-deplpoyment.yml
-replicaset.yml
+- hellopythonapp - Python app src code
+- Dockerfile - To build app images from the src code
+- Requirements.txt - Python packages required by app
 ```
 
 ```
-kubectl get pods
-Filter by label
-kubectl get pods -l name=pod_label
-```
-
-```
-#Print in particulat namespace
-kubectl get pods -n <NAME-SPACE>
-
-Print Pods in all NameSpace
-kubectl get pods -A
-```
-```
-> Print the pod output in YAML/JSON format
-
-$ kubectl get pods <POD-NAME> -o yaml  
-$ kubectl get pods <POD-NAME> -o json
-```
-########################################
-#### POD2 #####
-
-```
-Set envrionment variable
-```
-  - name: nginxcontainer
-    image: nginx
-    env:
-      - name: greeting
-        value: "hello from environment variable" 
-```
-```
-Now sh to pod
-kubectl exec -it sh podname
-# environment Variables
-
-```
-output-
-greeting=hello from environment variable
-```
-
-#### YAML Walkthrough
-```
-apiversion -This refers to the version of Kubernetes
-Some common ones are v1, apps/v1, and extensions/v1beta1.
-```
-
-```
-kind- This is the type of Kubernetes object. In this case (the example above), we’re creating a pod.
-```
-```
-Metadata-The metadata houses information that describes the object briefly. name the object is the only mandatory field and the remaining are optional. Name of object..like pod or deployment
-```
-
-```
-spec: The spec section is where we define containers that will run inside the pod.
-The image of the application you want to run in your pods.
-The name of the container that you’ll run in your pod.
-ContainerPort is the port of your application in your container and the environment variable inside the containers.
+#### Kubernetes files
+deployment.yml
+nodeportservice.yml
 ```
 
 
 ```
-Get all in 1 line
- kubectl get pods,deployment,rs  
- no space 
+App code
+Dockerfile builds image from src code
+push image to dockerhub
+deployment.yml spins container with 2 replicas from docker image built in step and pulls docker image
 ```
 
-
-#### Nodeport, Ingress, Loadbalancer - To get external traffic to the cluster
-<p> #### <b>ClusterIP</b> is default kubernetes service. Automatically created. There is no external access.</p>
-
-### Nodeport
+#### Secrets setup
+secret.yml manifest define it
 ```
-<p><b>NodePort</b>, as the name implies, opens a specific port on all the Nodes (the VMs), and any traffic that is sent to this port is forwarded to the service.</p>
-<img src="./nodeport.png" alt="NodePort"/>
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
+data:
+  password: "somesecret"  #Use secret management 
 ```
 
-#### Load Balancer
 ```
-<p><b>LoadBalancer</b> A LoadBalancer service is the standard way to expose a service to the internet. On Azure this will spin up a Network Load Balancer that will give you a single IP address that will forward all traffic to your service.</p>
+deployment.yml
+This will create a volume named mysecret that is backed by the mysecret secret, and mount it at /etc/mysecret in the container.
+        volumeMounts:
+        - name: mysecret  
+          mountPath: /etc/mysecret
 ```
-<img src="./loadbalancer.png" alt="Load Balancer"/>
 
+```
+        env:
+          - name: customenv
+            value: "Hello from customenv"
+          - name: lob
+            value: "XYZLOB"
+# Use secrets from secret.yml 
+#in your Deployment.yaml file, you can modify the container spec to add the secrets as environment variables:
+# The ENVIRONMENT variable CLIENT_SECRET is set to the value of the key key in the mysecret secret.          
+          - name: CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: clientsecret
+```
+
+```
+Full deployment.yml
+####### In your Deployment.yaml file, you can modify the container spec to add the secrets as environment variables:
+secret will be setup as environment variable in the container.
+
+
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      volumes:
+      - name: mysecret
+        secret:
+          secretName: mysecret
+      containers:
+      - name: myapp
+        image: myapp:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: mysecret
+          mountPath: /etc/mysecret
+        env:
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: mysecret
+              key: key
+```        

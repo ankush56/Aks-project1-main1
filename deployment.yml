@@ -1,27 +1,38 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nginx-deployment
+  name: python-app-deployment
 spec:
   selector: #match label and assign this deployment OBJECT to pods with label app:nginx
     matchLabels:  
-      app:  nginx
-  replicas: 3
+      app: hellopythonapp
+  replicas: 1
   template:   #Template used to create pods
     metadata:
-      name: nginx-pod #pod name
+      name: hellopythonapp
       labels:   #label for pod app=nginx
-        app: nginx
+        app: hellopythonapp
     spec:
       containers:
-      - name: nginx
-        image: nginx
+      - name: hellopythonappcontainer
+        image: walia56/pyhello:latest
+
         env:
           - name: customenv
             value: "Hello from customenv"
+          - name: lob
+            value: "XYZLOB"
+# Use secrets from secret.yml 
+#in your Deployment.yaml file, you can modify the container spec to add the secrets as environment variables:
+# The ENVIRONMENT variable CLIENT_SECRET is set to the value of the key key in the mysecret secret.          
+          - name: CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: clientsecret
         resources:
           limits:
             memory: "128Mi"
             cpu: "500m"
         ports:
-        - containerPort: 80
+        - containerPort: 8000

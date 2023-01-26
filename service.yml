@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: pythonappservice  # Name of nodeport service object
+spec:
+  selector:     #Apply this service object to this label
+    app:  hellopythonapp
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 8000
