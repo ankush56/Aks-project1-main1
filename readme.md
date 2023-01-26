@@ -130,8 +130,16 @@ kubectl port-forward <pod_name> <local_port>:<pod_port>
 ### Readiness and Liveness probe checks
 
 ```
+A liveness probe is used to determine whether the container is still running and able to handle requests. If the liveness probe fails, Kubernetes will restart the container. This is useful in cases where a container may become stuck or unresponsive, and needs to be restarted in order to continue functioning properly.
+
+A readiness probe, on the other hand, is used to determine whether a container is ready to handle requests. When a pod is created or starts up, it may not be immediately ready to handle requests. For example, it may be initializing a database connection or loading configuration files. The readiness probe allows Kubernetes to know when the container is ready to handle requests and start sending traffic to it. If the readiness probe fails, Kubernetes will not send traffic to the container, but it won't restart the container.
+```
+
+```
 <b>Readiness check </b>
 In this example, the readinessProbe is configured to make an HTTP GET request to the path /healthz on port 80 of the container. The probe will wait 5 seconds before the first check and will repeat every 5 seconds until the container is considered ready.
+
+You can check the readiness and liveness of the pod using kubectl describe pod <pod-name> and look for the Readiness and Liveness sections.
 
       containers:
       - name: my-container
@@ -142,4 +150,20 @@ In this example, the readinessProbe is configured to make an HTTP GET request to
             port: 80
           initialDelaySeconds: 5
           periodSeconds: 5
+```
+
+```
+<b>Liveness probe </b>
+
+The livenessProbe is configured to make an HTTP GET request to the path / on port 80 of the container. The probe will wait 15 seconds before the first check and will repeat every 15 seconds until the container is considered live.
+
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 15
+          periodSeconds: 15
+
+
+You can check the readiness and liveness of the pod using kubectl describe pod <pod-name> and look for the Readiness and Liveness sections.
 ```
