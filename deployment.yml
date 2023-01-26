@@ -13,23 +13,46 @@ spec:
       labels:   #label for pod app=nginx
         app: hellopythonapp
     spec:
+################## Set Volumes ###################################### 
+################## Secret and PVC ####################################   
+      volumes:
+      # Secret volume mount
+      - name: mysecret
+        secret:
+          secretName: clientsecret  
+
+############### Persistent volume mount ###############################
+      # We create PV first. Then PVC. On deployment we mount PVC
+      - name: appdata-volume
+        persistentVolumeClaim:
+          claimName: mypvc    #refer pvc created from pvc.yml
+################## Container ###########################              
       containers:
       - name: hellopythonappcontainer
         image: walia56/pyhello:latest
+        volumeMounts:
+          - name: appdata-volume
+            mountPath: /app/appdata   #Path on container to mount
 
+###########  Environments Variables ############   
         env:
           - name: customenv
             value: "Hello from customenv"
           - name: lob
             value: "XYZLOB"
-# Use secrets from secret.yml 
-#in your Deployment.yaml file, you can modify the container spec to add the secrets as environment variables:
-# The ENVIRONMENT variable CLIENT_SECRET is set to the value of the key key in the mysecret secret.          
+          - name: DATA_PATH
+            value: '/app/appdata'
+############  Secrets ############################         
+    # Use secrets from secret.yml 
+    #in your Deployment.yaml file, you can modify the container spec to add the secrets as environment variables:
+    # The ENVIRONMENT variable CLIENT_SECRET is set to the value of the key key in the mysecret secret.          
+ 
           - name: CLIENT_SECRET
             valueFrom:
               secretKeyRef:
                 name: mysecret
                 key: clientsecret
+##################################################                 
         resources:
           limits:
             memory: "128Mi"
