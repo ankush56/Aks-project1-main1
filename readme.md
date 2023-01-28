@@ -24,6 +24,24 @@ deployment.yml spins container with 2 replicas from docker image built in step a
  docker tag pyhello walia56/pyhello
  docker push walia56/pyhello:latest
 ```
+#### Environment variables ###
+
+``` 
+      containers:
+      - name: hellopythonappcontainer
+        image: walia56/pyhello:latest
+        env:
+          - name: customenv
+            value: "Hello from customenv"
+          - name: lob
+            value: "XYZLOB"
+          - name: DATA_PATH
+            value: '/app/appdata'
+```
+#### Volumes###
+<p>
+Mount volumes, secrets , configmaps as volumes
+</p>
 
 #### Secrets setup
 > secret.yml manifest define it
