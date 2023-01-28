@@ -44,9 +44,13 @@ Mount volumes, secrets , configmaps as volumes
 </p>
 
 #### Secrets setup
-> secret.yml manifest define it
-> encode somesecret as base64
-> To do that run- echo "somesecret" | base64
+<p>
+secret.yml manifest define it
+First encode secret as base64
+To do that run-> echo "somesecret" | base64
+Add this base64 encoded to secret.yml in password value
+</p>
+
 ```
 apiVersion: v1
 kind: Secret
@@ -54,7 +58,7 @@ metadata:
   name: mysecret
 type: Opaque
 data:
-  password: "somesecret"  #Use secret management 
+  password: "somesecret"  #Use secret management in prod, also base64 encode
 ```
 
 ```
