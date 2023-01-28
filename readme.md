@@ -167,3 +167,34 @@ The livenessProbe is configured to make an HTTP GET request to the path / on por
 
 You can check the readiness and liveness of the pod using kubectl describe pod <pod-name> and look for the Readiness and Liveness sections.
 ```
+
+#### Config map
+```
+> Use a ConfigMap to keep your application code separate from your configuration.
+
+> This lets you change easily configuration depending on the environment (development, production, testing) and to dynamically change configuration at runtime.
+
+> A ConfigMap stores configuration settings for your code. Store connection strings, public credentials, hostnames, and URLs in your ConfigMap. You can use ConfigMaps to store configuration data that your pods need to access at runtime.
+
+> First, you have multiple ConfigMaps, one for each environment.
+  Second, a ConfigMap is created and added to the Kubernetes cluster.
+  Third, containers in the Pod reference the ConfigMap and use its values.
+
+Create configmap.yml
+Apply
+Mount the ConfigMap through a Volume in deployment.yml
+Each property name in this ConfigMap becomes a new file in the mounted directory (`/etc/config`) after you mount it.
+ 
+2nd way
+Instead of volume mount use configmapref
+
+  containers:
+  - name: my-container
+    image: my-image
+    env:
+    - name: key1
+      valueFrom:
+        configMapKeyRef:
+          name: my-configmap
+          key: key1
+```

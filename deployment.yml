@@ -26,6 +26,12 @@ spec:
       - name: appdata-volume
         persistentVolumeClaim:
           claimName: mypvc    #refer pvc created from pvc.yml
+
+#####Config map volum e####
+      - name: config-volume
+        configMap:
+          name: myapp-configapp
+
 ################## Container ###########################              
       containers:
       - name: hellopythonappcontainer
@@ -33,6 +39,10 @@ spec:
         volumeMounts:
           - name: appdata-volume
             mountPath: /app/appdata   #Path on container to mount
+          
+          - name: config-volume   #config volume mount
+            mountPath: /etc/config
+
 ############## Readiness prob check ##################
         readinessProbe:
           httpGet:
