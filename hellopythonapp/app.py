@@ -1,4 +1,5 @@
 import os
+import hvac
 import pymongo
 from pymongo import MongoClient
 from flask import Flask, render_template, request
@@ -15,6 +16,7 @@ admin1 = os.environ.get('MONGO_USERNAME')
 pass1 = os.environ.get('MONGO_PASSWORD')
 
 environment = os.environ.get('environment')
+vault_token = os.environ.get('VAULT_TOKEN')
 
 # Use the data_path to read and write data
 with open(f'{data_path}/mydata.txt', 'w') as f:
@@ -56,9 +58,23 @@ def showdata():
 
 
 ####################################################
+##Hashicorp vault connection
+
+print("Connecting to Vault")
+# Dummy testing Vault
+vclient = hvac.Client(url='http://vault-service:8200', token='hvs.BvKXmJPWBzduIWkvCwoTujuq')
+
+print("Reading secrets")
+secret1 = vclient.read('secret/data/secretx')
+
+secret_value = secret1['data']['data']['somehashisecret']
+print(f"secrets is: {secret1}")
+print(f"Hashi secret value is : {secret_value}")
+
+####################################################
 @app.route("/")
 def hello():
     return render_template('index.html', message=environment)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=8000)
+    app.run(host='0.0.0.0', port=8000

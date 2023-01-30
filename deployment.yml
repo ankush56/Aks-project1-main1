@@ -35,7 +35,7 @@ spec:
 ################## Container ###########################              
       containers:
       - name: hellopythonappcontainer
-        image: walia56/pyhello:v23   #17 working 
+        image: walia56/pyhello:v36   #17 working 
         volumeMounts:
           - name: appdata-volume
             mountPath: /app/appdata   #Path on container to mount
@@ -82,7 +82,13 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: mysecret
-                key: mongo_user                                 
+                key: mongo_user    
+
+          - name: VAULT_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: vault_token                                             
 
 ############  Secrets ############################         
     # Use secrets from secret.yml 
