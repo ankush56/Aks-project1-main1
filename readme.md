@@ -313,4 +313,14 @@ Mount mongo pvc volume- section under volumes and container to define path
 
 Python App deployment file- 
 Set environment variables to configure the connection to the MongoDB service in your app deployment.yml file
+
+In python app pod. Read username and password from secret config. They will
+be set up as env vars in app
+
+Then in app code, make connection with db-
+admin1 = os.environ.get('MONGO_USERNAME')
+pass1 = os.environ.get('MONGO_PASSWORD')
+client = pymongo.MongoClient(f"mongodb://{admin1}:{pass1}@mongodb:27017/")
+
+
 ``` 
