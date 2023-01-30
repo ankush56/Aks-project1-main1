@@ -40,7 +40,7 @@ deployment.yml spins container with 2 replicas from docker image built in step a
 ```
 #### Volumes###
 <p>
-Mount volumes, secrets , configmaps as volumes
+<b>Mount volumes, secrets , configmaps as volumes. You can also get secrets, config map values without mounting as volume </b>
 </p>
 
 #### Secrets setup
@@ -58,36 +58,66 @@ metadata:
   name: mysecret
 type: Opaque
 data:
-  password: "somesecret"  #Use secret management in prod, also base64 encode
+  username: YWRtaW4=      #base 64 encoded, echo "somesecret" | base64 
+  password: MWYyZDFlMmU2N2Rm
+
 ```
 
 ```
 deployment.yml
-This will create a volume named mysecret that is backed by the mysecret secret, 
-and mount it at /etc/mysecret in the container.
-        volumeMounts:
-        - name: mysecret  
-          mountPath: /etc/mysecret
-```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+    spec:
+      containers:
+      - name: myapp-container
+        image: myapp:latest
+        env:
+        - name: username
+          valueFrom:
+            secretKeyRef:
+              name: mysecret  #name of object in secret manifest file
+              key: username   # Key to refer in secrets
+        - name: password
+          valueFrom:
+            secretKeyRef:
+              name: mysecret
+              key: password
 
 ```
-        env:
-          - name: customenv
-            value: "Hello from customenv"
-          - name: lob
-            value: "XYZLOB"
-# Use secrets from secret.yml 
+
+
+```
 #in your Deployment.yaml file, you can modify the container spec to add the secrets as environment variables:
-# The ENVIRONMENT variable CLIENT_SECRET is set to the value of the key key in the mysecret secret.          
+# The ENVIRONMENT variable CLIENT_SECRET is set to the value of the key key in the mysecret secret. No, need to mount if you are using this way         
           - name: CLIENT_SECRET
             valueFrom:
               secretKeyRef:
                 name: mysecret
                 key: clientsecret
+                
 ```
 
 ```
-#### Full deployment.yml
+<b>You can also get secrets, config map values without mounting as volume </b>
+
+#### Full deployment.yml with volume secret mounted
+This will create a volume named mysecret that is backed by the mysecret secret, 
+and mount it at /etc/mysecret in the container.
+        volumeMounts:
+        - name: mysecret  
+          mountPath: /etc/mysecret
+
 In your Deployment.yaml file, 
 you can modify the container spec to add the secrets as environment variables:
 secret will be setup as environment variable in the container.
@@ -229,12 +259,14 @@ kubectl describe pod <pod-name> and look for the Readiness and Liveness sections
 
 Create configmap.yml
 Apply
-Mount the ConfigMap through a Volume in deployment.yml
-Each property name in this ConfigMap becomes a new file in the mounted directory (`/etc/config`) after you mount it.
- 
-2nd way
-Instead of volume mount use configmapref
 
+You can then reference the ConfigMap in your pod or deployment configuration using the configMap field. Here's an example of how to reference a ConfigMap in a pod specification:
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
   containers:
   - name: my-container
     image: my-image
@@ -244,4 +276,41 @@ Instead of volume mount use configmapref
         configMapKeyRef:
           name: my-configmap
           key: key1
+
+
+ 
+2nd way
+You can also use configMapRef in the volumeMounts to mount the configMap as a volume in a container.
+Mount the ConfigMap through a Volume in deployment.yml
+Each property name in this ConfigMap becomes a new file in the mounted directory (`/etc/config`) after you mount it.
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: my-container
+    image: my-image
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
+  volumes:
+  - name: config-volume
+    configMap:
+      name: my-configmap
+
 ```
+### DB connection
+```
+Create 3 files
+mongo-db deployment-  To create pod with mongodb image
+mongo-db service- Ports communication
+mongodb pv and pvc - For persistent storage
+
+In deployment.yml mongo
+Mount mongo pvc volume- section under volumes and container to define path
+
+Python App deployment file- 
+Set environment variables to configure the connection to the MongoDB service in your app deployment.yml file
+``` 

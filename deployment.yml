@@ -13,7 +13,7 @@ spec:
       labels:   #label for pod app=nginx
         app: hellopythonapp
     spec:
-################## Set Volumes ###################################### 
+################## Set Volumes ########################################
 ################## Secret and PVC ####################################   
       volumes:
       # Secret volume mount
@@ -35,7 +35,7 @@ spec:
 ################## Container ###########################              
       containers:
       - name: hellopythonappcontainer
-        image: walia56/pyhello:latest
+        image: walia56/pyhello:v23   #17 working 
         volumeMounts:
           - name: appdata-volume
             mountPath: /app/appdata   #Path on container to mount
@@ -66,6 +66,24 @@ spec:
             value: "XYZLOB"
           - name: DATA_PATH
             value: '/app/appdata'
+          - name: environment
+            valueFrom:
+              configMapKeyRef:
+                name: myapp-configapp
+                key: environment
+
+          - name: MONGO_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: mongo_password 
+
+          - name: MONGO_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: mysecret
+                key: mongo_user                                 
+
 ############  Secrets ############################         
     # Use secrets from secret.yml 
     #in your Deployment.yaml file, you can modify the container spec to add the secrets as environment variables:
